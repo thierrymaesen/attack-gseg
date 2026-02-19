@@ -1,0 +1,63 @@
+[tool.poetry]
+name = "attack-gseg"
+version = "0.1.0"
+description = "MITRE ATT&CK threat intelligence mapper for space ground segment operations"
+authors = ["Thierry Maesen <thierry.maesen@proton.me>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "gseg", from = "src"}]
+
+[tool.poetry.urls]
+homepage = "https://github.com/thierrymaesen"
+repository = "https://github.com/thierrymaesen/attack-gseg"
+documentation = "https://github.com/thierrymaesen/attack-gseg#readme"
+"Bug Tracker" = "https://github.com/thierrymaesen/attack-gseg/issues"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+stix2 = "^3.0.0"
+networkx = "^3.2"
+scikit-learn = "^1.4.0"
+sentence-transformers = "^2.3.0"
+rank-bm25 = "^0.2.2"
+fastapi = "^0.109.0"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
+gradio = "^4.16.0"
+pydantic = "^2.5.0"
+requests = "^2.31.0"
+tqdm = "^4.66.0"
+rich = "^13.7.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+pytest-asyncio = "^0.23.0"
+ruff = "^0.1.0"
+black = "^24.0.0"
+mypy = "^1.8.0"
+
+[tool.poetry.scripts]
+gseg = "gseg.__main__:main"
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I", "N", "W"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
