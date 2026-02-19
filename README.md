@@ -21,10 +21,10 @@ Map ground segment logs and security events to MITRE ATT&CK techniques using:
 
 ## 🚧 Development Status
 
-**Sprint Progress:** 0/11 completed
+**Sprint Progress:** 2/11 completed
 
 - [x] Sprint 0 — Project setup
-- [ ] Sprint 1 — Data ingestion (ATT&CK STIX)
+- [x] Sprint 1 — Data ingestion (ATT&CK STIX)
 - [ ] Sprint 2 — Graph building (NetworkX)
 - [ ] Sprint 3 — Retrieval engine (BM25)
 - [ ] Sprint 4 — Reranking (embeddings)
