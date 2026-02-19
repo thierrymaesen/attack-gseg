@@ -1,0 +1,91 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# ========================
+# Testing & Coverage
+# ========================
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+
+# ========================
+# Virtual environments
+# ========================
+.venv/
+venv/
+env/
+ENV/
+.python-version-local
+
+# ========================
+# Package / Build
+# ========================
+dist/
+build/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+
+# ========================
+# Data files (heavy / generated)
+# ========================
+data/*.json
+!data/synthetic_logs.json
+data/*.gpickle
+data/*.pkl
+data/*.parquet
+data/*.csv
+
+# Keep the data directory in git
+!data/.gitkeep
+
+# ========================
+# Logs
+# ========================
+*.log
+
+# ========================
+# Environment / Secrets
+# ========================
+.env
+.env.local
+.env.production
+.env.*.local
+
+# ========================
+# Linters & Type checkers cache
+# ========================
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+
+# ========================
+# IDEs
+# ========================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ========================
+# OS
+# ========================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ========================
+# Jupyter (if used later)
+# ========================
+.ipynb_checkpoints/
