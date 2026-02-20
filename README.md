@@ -21,7 +21,7 @@ Map ground segment logs and security events to MITRE ATT&CK techniques using:
 
 ## 🚧 Development Status
 
-**Sprint Progress:** 9/11 completed
+**Sprint Progress:** 10/11 completed
 
 - [x] Sprint 0 — Project setup
 - [x] Sprint 1 — Data ingestion (ATT&CK STIX)
@@ -32,7 +32,7 @@ Map ground segment logs and security events to MITRE ATT&CK techniques using:
 - [x] Sprint 6 — UI (Gradio)
 - [x] Sprint 7 — Tests (pytest)
 - [x] Sprint 8 — Evaluation
-- [ ] Sprint 9 — CI/CD (GitHub Actions)
+- [x] Sprint 9 — CI/CD (GitHub Actions)
 - [ ] Sprint 10 — Documentation
 
 ---
