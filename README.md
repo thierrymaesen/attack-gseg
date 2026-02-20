@@ -13,6 +13,54 @@
 
 ---
 
+## 🎬 Demo — Pipeline in Action
+
+Click the **Open in Colab** badge above to run the full pipeline interactively — no install required. Below is a walkthrough of each stage with real output.
+
+### Pipeline Overview
+
+```mermaid
+flowchart LR
+    A[📥 MITRE ATT&CK\nSTIX Bundle] --> B[🔄 Ingest\n691 techniques\n44 mitigations]
+    B --> C[🕸️ Build Graph\n735 nodes\n1 445 edges]
+    C --> D[🔍 BM25 Search\nKeyword retrieval]
+    D --> E[🧠 Reranker\nMiniLM embeddings]
+    E --> F[⚡ FastAPI\nREST endpoints]
+    F --> G[📊 Results\nTechniques + Mitigations]
+```
+
+### Step 1 — Ingest ATT&CK STIX Data
+
+The pipeline downloads the official [MITRE ATT&CK Enterprise STIX bundle](https://github.com/mitre/cti) (43 MB) and parses it into structured JSON files. The counts match the official MITRE ATT&CK database exactly: **691 techniques** (216 + 475 sub-techniques), **44 mitigations**, and **1 445 relationships**.
+
+![Ingest output showing 691 techniques, 44 mitigations, 1445 relations](https://github.com/user-attachments/assets/f8b03b80-2117-4ee6-8f3b-fc3e5f8bccc0)
+
+### Step 2 — Build Knowledge Graph
+
+A directed NetworkX graph is constructed with **735 nodes** (691 techniques + 44 mitigations) and **1 445 edges** (mitigation→technique relationships). The statistics reveal that `defense-evasion` is the most represented tactic (215 techniques), and 84.2% of techniques have at least one documented mitigation.
+
+![Knowledge graph statistics showing 735 nodes, 1445 edges, top tactics](https://github.com/user-attachments/assets/0454b9f4-da48-4d44-b2a5-d0d70ca55c2c)
+
+### Step 3 — BM25 Keyword Retrieval
+
+A BM25 index over technique descriptions enables fast keyword search. For the query `"SSH lateral movement"`, the engine correctly returns **T1570 — Lateral Tool Transfer** as the top match, followed by SSH-related techniques and their mitigations.
+
+![BM25 search results for SSH lateral movement query](https://github.com/user-attachments/assets/0b891b1e-60d9-4922-b3ff-d5c600a130f7)
+
+### Step 4 — Semantic Reranking
+
+BM25 candidates are reranked using `all-MiniLM-L6-v2` sentence embeddings for semantic relevance. For `"process injection to evade detection"`, the reranker places **T1055 — Process Injection** at #1 (score 0.5990) and promotes T1564.011 from BM25 rank 17 to rank 2, demonstrating the value of semantic understanding over pure keyword matching.
+
+![Semantic reranking results showing rerank scores and rank changes](https://github.com/user-attachments/assets/f5426cb5-fd88-44f4-905e-f45932ec3091)
+
+### Step 5 — FastAPI + Live Query
+
+The FastAPI server exposes `/map_event`, `/techniques`, and `/health` endpoints. A query for `"phishing email with malicious attachment"` returns **T1566 — Phishing** as the top result with its official MITRE mitigations (Antivirus/Antimalware, Audit, Network Intrusion Prevention) — all verified against the [MITRE ATT&CK website](https://attack.mitre.org/techniques/T1566/).
+
+![API response for phishing query with techniques and mitigations](https://github.com/user-attachments/assets/77f63c8b-2bfe-48ff-855f-28858e9dc353)
+
+---
+
 ## ✨ Features
 
 - 🧠 **Semantic Search** — Combines BM25 retrieval with `all-MiniLM-L6-v2` sentence embeddings for context-aware technique detection.
@@ -58,21 +106,21 @@ The API is available at **http://localhost:8000** and the Gradio UI at **http://
 ## 🏗️ Architecture
 
 ```text
-                          ATT&CK Ground Segment Threat Graph
-                          ==================================
+ ATT&CK Ground Segment Threat Graph
+ ==================================
 
-  +-----------+     +-------------+     +---------------------+     +------------------+
-  |  Security |     |   FastAPI   |     |   Retrieval Engine  |     |  Knowledge Graph |
-  |   Logs    | --> |   /map_event| --> | BM25 + Reranker     | --> |   (NetworkX)     |
-  |  (events) |     |   REST API  |     | (MiniLM embeddings) |     |                  |
-  +-----------+     +-------------+     +---------------------+     +------------------+
-                          |                                               |
-                          v                                               v
-                    +----------+                                  +----------------+
-                    | Gradio UI|                                  | Techniques     |
-                    | (analysts|                                  | Mitigations    |
-                    |  triage) |                                  | Relationships  |
-                    +----------+                                  +----------------+
+ +-----------+   +-------------+   +---------------------+   +------------------+
+ | Security  |   | FastAPI     |   | Retrieval Engine    |   | Knowledge Graph  |
+ | Logs      |-->| /map_event  |-->| BM25 + Reranker     |-->| (NetworkX)       |
+ | (events)  |   | REST API    |   | (MiniLM embeddings) |   |                  |
+ +-----------+   +-------------+   +---------------------+   +------------------+
+                       |                                             |
+                       v                                             v
+                 +----------+                              +----------------+
+                 | Gradio UI|                              | Techniques     |
+                 | (analysts|                              | Mitigations    |
+                 | triage)  |                              | Relationships  |
+                 +----------+                              +----------------+
 ```
 
 **Data flow:**
@@ -134,24 +182,25 @@ Tests cover data ingestion, graph building, BM25 retrieval, semantic reranking, 
 
 ```text
 attack-gseg/
-├── .github/workflows/ci.yml   # GitHub Actions CI pipeline
+├── .github/workflows/ci.yml # GitHub Actions CI pipeline
 ├── app/
-│   └── gradio_app.py              # Gradio web interface
+│   └── gradio_app.py         # Gradio web interface
 ├── src/gseg/
-│   ├── __init__.py                # Package metadata
-│   ├── ingest_attack.py           # STIX data ingestion
-│   ├── build_graph.py             # Knowledge graph construction
-│   ├── retrieve.py                # BM25 retrieval engine
-│   ├── rank.py                    # Semantic reranking
-│   └── api.py                     # FastAPI REST API
+│   ├── __init__.py            # Package metadata
+│   ├── ingest_attack.py       # STIX data ingestion
+│   ├── build_graph.py         # Knowledge graph construction
+│   ├── retrieve.py            # BM25 retrieval engine
+│   ├── rank.py                # Semantic reranking
+│   └── api.py                 # FastAPI REST API
 ├── tests/
-│   ├── test_ingest.py             # Ingestion tests
-│   ├── test_graph.py              # Graph building tests
-│   ├── test_retrieve.py           # Retrieval tests
-│   ├── test_rank.py               # Reranking tests
-│   └── test_api.py                # API endpoint tests
-├── pyproject.toml                 # Poetry project config
-└── README.md                      # This file
+│   ├── test_ingest.py         # Ingestion tests
+│   ├── test_graph.py          # Graph building tests
+│   ├── test_retrieve.py       # Retrieval tests
+│   ├── test_rank.py           # Reranking tests
+│   └── test_api.py            # API endpoint tests
+├── demo.ipynb                 # Interactive Colab demo
+├── pyproject.toml             # Poetry project config
+└── README.md                  # This file
 ```
 
 ---
