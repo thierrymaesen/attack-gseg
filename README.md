@@ -21,7 +21,7 @@ Map ground segment logs and security events to MITRE ATT&CK techniques using:
 
 ## 🚧 Development Status
 
-**Sprint Progress:** 6/11 completed
+**Sprint Progress:** 7/11 completed
 
 - [x] Sprint 0 — Project setup
 - [x] Sprint 1 — Data ingestion (ATT&CK STIX)
@@ -29,7 +29,7 @@ Map ground segment logs and security events to MITRE ATT&CK techniques using:
 - [x] Sprint 3 — Retrieval engine (BM25)
 - [x] Sprint 4 — Reranking (embeddings)
 - [x] Sprint 5 — API (FastAPI)
-- [ ] Sprint 6 — UI (Gradio)
+- [x] Sprint 6 — UI (Gradio)
 - [ ] Sprint 7 — Tests (pytest)
 - [ ] Sprint 8 — Evaluation
 - [ ] Sprint 9 — CI/CD (GitHub Actions)
