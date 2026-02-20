@@ -1,0 +1,88 @@
+# ---------------------------------------------------------------------------
+# CI workflow for ATT&CK Ground Segment Threat Graph (attack-gseg)
+#
+# Triggers on every push and pull-request targeting the main branch.
+# Steps: checkout > Python 3.10 > Poetry > cache > install > lint > fmt > test
+# ---------------------------------------------------------------------------
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ----------------------------------------------------------------
+      # 1. Checkout repository
+      # ----------------------------------------------------------------
+      - uses: actions/checkout@v4
+
+      # ----------------------------------------------------------------
+      # 2. Set up Python 3.10
+      # ----------------------------------------------------------------
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      # ----------------------------------------------------------------
+      # 3. Install Poetry
+      # ----------------------------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      # ----------------------------------------------------------------
+      # 4. Load cached virtualenv (speeds up repeat builds)
+      # ----------------------------------------------------------------
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      # ----------------------------------------------------------------
+      # 5. Install dependencies (skip when cache hit)
+      # ----------------------------------------------------------------
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      # ----------------------------------------------------------------
+      # 6. Install project (always, to get the editable package)
+      # ----------------------------------------------------------------
+      - name: Install project
+        run: poetry install --no-interaction
+
+      # ----------------------------------------------------------------
+      # 7. Lint with Ruff
+      # ----------------------------------------------------------------
+      - name: Lint with Ruff
+        run: poetry run ruff check src/ tests/
+
+      # ----------------------------------------------------------------
+      # 8. Check formatting with Black
+      # ----------------------------------------------------------------
+      - name: Check formatting with Black
+        run: poetry run black --check src/ tests/
+
+      # ----------------------------------------------------------------
+      # 9. Run tests with coverage
+      # ----------------------------------------------------------------
+      - name: Run tests
+        run: |
+          poetry run pytest tests/ -v \
+            --cov=src \
+            --cov-report=term-missing
