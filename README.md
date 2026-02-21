@@ -73,7 +73,16 @@ The FastAPI server exposes `/map_event`, `/techniques`, and `/health` endpoints.
 
 ## 🚀 Quickstart
 
+### Prerequisites
+
+- **Python 3.10+** — [Download](https://www.python.org/downloads/)
+- **Poetry** (recommended) — [Install Poetry](https://python-poetry.org/docs/#installation)
+
+> **No Poetry?** You can use `pip` instead — see the **pip** alternative in each step below.
+
 ### 1. Clone & Install
+
+**With Poetry (recommended):**
 
 ```bash
 git clone https://github.com/thierrymaesen/attack-gseg.git
@@ -81,7 +90,17 @@ cd attack-gseg
 poetry install
 ```
 
+**With pip:**
+
+```bash
+git clone https://github.com/thierrymaesen/attack-gseg.git
+cd attack-gseg
+pip install -e .
+```
+
 ### 2. Ingest ATT&CK Data (first run only)
+
+**With Poetry:**
 
 ```bash
 # Download MITRE ATT&CK STIX bundle and build the knowledge graph
@@ -89,7 +108,17 @@ poetry run python -m gseg.ingest_attack
 poetry run python -m gseg.build_graph
 ```
 
+**With pip:**
+
+```bash
+# Download MITRE ATT&CK STIX bundle and build the knowledge graph
+python -m gseg.ingest_attack
+python -m gseg.build_graph
+```
+
 ### 3. Run the Application
+
+**With Poetry:**
 
 ```bash
 # Terminal 1 — Start the API server
@@ -99,28 +128,46 @@ poetry run uvicorn gseg.api:app --reload
 poetry run python app/gradio_app.py
 ```
 
+**With pip:**
+
+```bash
+# Terminal 1 — Start the API server
+uvicorn gseg.api:app --reload
+
+# Terminal 2 — Start the Gradio UI
+python app/gradio_app.py
+```
+
 The API is available at **http://localhost:8000** and the Gradio UI at **http://localhost:7860**.
+
+### ☁️ Google Colab (no install required)
+
+Click the badge below to run the full pipeline in your browser:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/thierrymaesen/attack-gseg/blob/main/demo.ipynb)
+
+The notebook uses `pip install -e .` under the hood — Poetry is not needed on Colab.
 
 ---
 
 ## 🏗️ Architecture
 
 ```text
- ATT&CK Ground Segment Threat Graph
- ==================================
+    ATT&CK Ground Segment Threat Graph
+    ==================================
 
- +-----------+   +-------------+   +---------------------+   +------------------+
- | Security  |   | FastAPI     |   | Retrieval Engine    |   | Knowledge Graph  |
- | Logs      |-->| /map_event  |-->| BM25 + Reranker     |-->| (NetworkX)       |
- | (events)  |   | REST API    |   | (MiniLM embeddings) |   |                  |
- +-----------+   +-------------+   +---------------------+   +------------------+
-                       |                                             |
-                       v                                             v
-                 +----------+                              +----------------+
-                 | Gradio UI|                              | Techniques     |
-                 | (analysts|                              | Mitigations    |
-                 | triage)  |                              | Relationships  |
-                 +----------+                              +----------------+
+    +-----------+  +-------------+  +---------------------+  +------------------+
+    | Security  |  | FastAPI     |  | Retrieval Engine    |  | Knowledge Graph  |
+    | Logs      |-->| /map_event  |-->| BM25 + Reranker     |-->| (NetworkX)       |
+    | (events)  |  | REST API    |  | (MiniLM embeddings) |  |                  |
+    +-----------+  +-------------+  +---------------------+  +------------------+
+                         |                                          |
+                         v                                          v
+                   +----------+                            +----------------+
+                   | Gradio UI|                            | Techniques     |
+                   | (analysts|                            | Mitigations    |
+                   | triage)  |                            | Relationships  |
+                   +----------+                            +----------------+
 ```
 
 **Data flow:**
@@ -163,6 +210,8 @@ curl -X POST http://localhost:8000/map_event \
 
 ## 🧪 Testing
 
+**With Poetry:**
+
 ```bash
 # Run all tests with coverage report
 poetry run pytest tests/ -v --cov=src --cov-report=term-missing
@@ -174,6 +223,22 @@ poetry run ruff check src/ tests/
 poetry run black --check src/ tests/
 ```
 
+**With pip:**
+
+```bash
+# Install dev dependencies first
+pip install pytest pytest-cov ruff black
+
+# Run all tests with coverage report
+pytest tests/ -v --cov=src --cov-report=term-missing
+
+# Run linting
+ruff check src/ tests/
+
+# Check formatting
+black --check src/ tests/
+```
+
 Tests cover data ingestion, graph building, BM25 retrieval, semantic reranking, and all FastAPI endpoints.
 
 ---
@@ -182,25 +247,25 @@ Tests cover data ingestion, graph building, BM25 retrieval, semantic reranking, 
 
 ```text
 attack-gseg/
-├── .github/workflows/ci.yml # GitHub Actions CI pipeline
+├── .github/workflows/ci.yml   # GitHub Actions CI pipeline
 ├── app/
-│   └── gradio_app.py         # Gradio web interface
+│   └── gradio_app.py           # Gradio web interface
 ├── src/gseg/
-│   ├── __init__.py            # Package metadata
-│   ├── ingest_attack.py       # STIX data ingestion
-│   ├── build_graph.py         # Knowledge graph construction
-│   ├── retrieve.py            # BM25 retrieval engine
-│   ├── rank.py                # Semantic reranking
-│   └── api.py                 # FastAPI REST API
+│   ├── __init__.py              # Package metadata
+│   ├── ingest_attack.py         # STIX data ingestion
+│   ├── build_graph.py           # Knowledge graph construction
+│   ├── retrieve.py              # BM25 retrieval engine
+│   ├── rank.py                  # Semantic reranking
+│   └── api.py                   # FastAPI REST API
 ├── tests/
-│   ├── test_ingest.py         # Ingestion tests
-│   ├── test_graph.py          # Graph building tests
-│   ├── test_retrieve.py       # Retrieval tests
-│   ├── test_rank.py           # Reranking tests
-│   └── test_api.py            # API endpoint tests
-├── demo.ipynb                 # Interactive Colab demo
-├── pyproject.toml             # Poetry project config
-└── README.md                  # This file
+│   ├── test_ingest.py           # Ingestion tests
+│   ├── test_graph.py            # Graph building tests
+│   ├── test_retrieve.py         # Retrieval tests
+│   ├── test_rank.py             # Reranking tests
+│   └── test_api.py              # API endpoint tests
+├── demo.ipynb                   # Interactive Colab demo
+├── pyproject.toml               # Poetry project config
+└── README.md                    # This file
 ```
 
 ---
