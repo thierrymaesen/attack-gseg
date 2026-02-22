@@ -85,7 +85,7 @@ The FastAPI server exposes `/map_event`, `/techniques`, and `/health` endpoints.
 **With Poetry (recommended):**
 
 ```bash
-git clone https://github.com/thierrymaesen/attack-gseg.git
+git clone https://github.com/thierrymaesen/attack-gseg.gith
 cd attack-gseg
 poetry install
 ```
@@ -139,6 +139,50 @@ python app/gradio_app.py
 ```
 
 The API is available at **http://localhost:8000** and the Gradio UI at **http://localhost:7860**.
+
+### 🖥️ Local Usage Guide — Step by Step
+
+Once both servers are running, here is how to use the application locally on your computer.
+
+#### Step 1 — Verify the API is running
+
+Open your browser and navigate to `http://localhost:8000/health`. You should see the following JSON response confirming the API is operational and all models are loaded:
+
+![API Health Check — status ok and models loaded](https://github.com/user-attachments/assets/fab7dc97-5052-468a-b1c9-7bba14e9b950)
+
+> **Note:** If you visit `http://localhost:8000` directly, you will see `{"detail":"Not Found"}` — this is **normal**. The API has no homepage; it only responds on its specific endpoints (`/health`, `/map_event`, `/techniques`).
+>
+> #### Step 2 — Explore the API documentation (Swagger UI)
+>
+> Navigate to `http://localhost:8000/docs` to access the interactive Swagger documentation. Here you can see all available endpoints, test them directly from the browser, and inspect request/response schemas:
+>
+> ![Swagger UI — interactive API documentation with all endpoints](https://github.com/user-attachments/assets/e33142d2-c419-4c84-a72f-46b68400c77d)
+>
+> The API exposes three endpoints: `GET /health` (service health check), `POST /map_event` (map a security event to ATT&CK techniques), and `GET /techniques` (list all indexed techniques).
+>
+> #### Step 3 — Open the Gradio interface
+>
+> Navigate to `http://localhost:7860` in your browser. The Gradio web interface loads with a text area where you can describe a security event, a slider to choose how many results to display (Top K), and a checkbox to include mitigations:
+>
+> ![Gradio UI — main interface ready for input](https://github.com/user-attachments/assets/eb708709-5190-4791-862c-20021acca411)
+>
+> #### Step 4 — Enter a security event description
+>
+> Type or paste a security event description in the text area. For example: *"Unauthorized SSH access from unknown IP attempting lateral movement to ground station controller"*. Adjust the **Top K Results** slider if needed (default is 3), then click the **Analyze Threat** button:
+>
+> ![Gradio UI — security event entered, ready to analyze](https://github.com/user-attachments/assets/4a029140-66e0-41ef-8fb6-028c0400e30f)
+>
+> #### Step 5 — Review the analysis results
+>
+> After clicking **Analyze Threat**, the system returns the top matching MITRE ATT&CK techniques ranked by relevance. Each result includes the technique ID (linked to MITRE), the technique name, BM25 and rerank scores, associated tactics, and recommended mitigations:
+>
+> ![Analysis results — top technique T1563.001 SSH Hijacking with mitigations](https://github.com/user-attachments/assets/aeba3367-caf9-4219-9596-a35d1d2ac11a)
+>
+> Scroll down to see additional matching techniques. In this example, the system identified three relevant techniques: **T1563.001 — SSH Hijacking**, **T1021.004 — SSH**, and **T1098.004 — SSH Authorized Keys**, each with their associated tactics and mitigations:
+>
+> ![Analysis results continued — techniques T1021.004 SSH and T1098.004 SSH Authorized Keys](https://github.com/user-attachments/assets/ee5fb5ea-b6a2-445c-acec-b06040846bdf)
+>
+> > **Tip:** Click on any technique ID (e.g., T1563.001) or mitigation ID (e.g., M1042) to open the corresponding page on the official MITRE ATT&CK website for more details.
 
 ### ☁️ Google Colab (no install required)
 
