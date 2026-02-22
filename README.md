@@ -85,7 +85,7 @@ The FastAPI server exposes `/map_event`, `/techniques`, and `/health` endpoints.
 **With Poetry (recommended):**
 
 ```bash
-git clone https://github.com/thierrymaesen/attack-gseg.gith
+git clone https://github.com/thierrymaesen/attack-gseg.git
 cd attack-gseg
 poetry install
 ```
