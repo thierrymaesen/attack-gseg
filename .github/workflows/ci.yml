@@ -54,7 +54,13 @@ jobs:
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       # ----------------------------------------------------------------
-      # 5. Install dependencies (skip when cache hit)
+      # 5. Regenerate lock file (in case pyproject.toml changed)
+      # ----------------------------------------------------------------
+      - name: Update lock file
+        run: poetry lock --no-update
+
+      # ----------------------------------------------------------------
+      # 6. Install dependencies (skip when cache hit)
       # ----------------------------------------------------------------
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
@@ -70,13 +76,13 @@ jobs:
       # 7. Lint with Ruff
       # ----------------------------------------------------------------
       - name: Lint with Ruff
-        run: poetry run ruff check --fix src/ tests/
+        run: poetry run ruff check src/ tests/
 
       # ----------------------------------------------------------------
       # 8. Check formatting with Black
       # ----------------------------------------------------------------
       - name: Check formatting with Black
-        run: poetry run black src/ tests/
+        run: poetry run black --check src/ tests/
 
       # ----------------------------------------------------------------
       # 9. Run tests with coverage
