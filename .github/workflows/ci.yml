@@ -4,6 +4,7 @@
 # Triggers on every push and pull-request targeting the main branch.
 # Steps: checkout > Python 3.10 > Poetry > cache > install > lint > fmt > test
 # ---------------------------------------------------------------------------
+
 name: CI
 
 on:
@@ -67,25 +68,25 @@ jobs:
         run: poetry install --no-interaction --no-root
 
       # ----------------------------------------------------------------
-      # 6. Install project (always, to get the editable package)
+      # 7. Install project (always, to get the editable package)
       # ----------------------------------------------------------------
       - name: Install project
         run: poetry install --no-interaction
 
       # ----------------------------------------------------------------
-      # 7. Lint with Ruff
+      # 8. Lint with Ruff
       # ----------------------------------------------------------------
       - name: Lint with Ruff
         run: poetry run ruff check --fix src/ tests/
 
       # ----------------------------------------------------------------
-      # 8. Check formatting with Black
+      # 9. Auto-format with Black (applies formatting in-place)
       # ----------------------------------------------------------------
-      - name: Check formatting with Black
-        run: poetry run black --check src/ tests/
+      - name: Format with Black
+        run: poetry run black src/ tests/
 
       # ----------------------------------------------------------------
-      # 9. Run tests with coverage
+      # 10. Run tests with coverage
       # ----------------------------------------------------------------
       - name: Run tests
         run: |
