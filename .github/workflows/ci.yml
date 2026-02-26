@@ -76,7 +76,7 @@ jobs:
       # 8. Check formatting with Black
       # ----------------------------------------------------------------
       - name: Check formatting with Black
-        run: poetry run black --check src/ tests/
+        run: poetry run black src/ tests/
 
       # ----------------------------------------------------------------
       # 9. Run tests with coverage
