@@ -70,7 +70,7 @@ jobs:
       # 7. Lint with Ruff
       # ----------------------------------------------------------------
       - name: Lint with Ruff
-      run: poetry run ruff check --fix src/ tests/
+        run: poetry run ruff check --fix src/ tests/
 
       # ----------------------------------------------------------------
       # 8. Check formatting with Black
