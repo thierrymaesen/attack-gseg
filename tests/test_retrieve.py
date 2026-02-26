@@ -24,12 +24,12 @@ def mock_graph_index(tmp_path: Path) -> Dict[str, Path]:
     """Create a small graph and text index for retrieval tests.
 
         Graph contains three techniques and two mitigations with edges:
-                M1 -> T1  (mitigates)
-                        M2 -> T2  (mitigates)
+            M1 -> T1  (mitigates)
+                    M2 -> T2  (mitigates)
 
-                            Returns:
-                                    Dictionary with ``graph_path`` and ``index_path`` keys.
-                                        """
+                        Returns:
+                            Dictionary with ``graph_path`` and ``index_path`` keys.
+                                """
     g: nx.DiGraph = nx.DiGraph()
 
     # --- techniques ---
@@ -81,7 +81,7 @@ def mock_graph_index(tmp_path: Path) -> Dict[str, Path]:
     # --- serialize graph ---
     graph_path: Path = tmp_path / "attack_graph.gpickle"
     with open(graph_path, "wb") as fh:
-                pickle.dump(g, fh)
+        pickle.dump(g, fh)
 
     # --- text index ---
     text_index: Dict[str, str] = {
@@ -259,11 +259,10 @@ class TestRetrieverErrors:
         g.add_node("T1", type="technique", name="Test")
         graph_path: Path = tmp_path / "graph.gpickle"
         with open(graph_path, "wb") as fh:
-                            pickle.dump(g, fh)
+            pickle.dump(g, fh)
 
         with pytest.raises(FileNotFoundError):
-                            RetrieverBM25(
-                                    graph_path=graph_path,
-                                    text_index_path=tmp_path / "missing.json",
-                            )
-                            )
+            RetrieverBM25(
+                    graph_path=graph_path,
+                    text_index_path=tmp_path / "missing.json",
+            )
