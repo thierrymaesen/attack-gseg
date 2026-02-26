@@ -25,6 +25,7 @@ uvicorn = {extras = ["standard"], version = "^0.27.0"}
 gradio = "^4.16.0"
 pydantic = "^2.5.0"
 requests = "^2.31.0"
+httpx = ">=0.24,<0.28"
 tqdm = "^4.66.0"
 rich = "^13.7.0"
 
