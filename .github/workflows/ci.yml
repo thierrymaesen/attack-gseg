@@ -57,7 +57,7 @@ jobs:
       # 5. Regenerate lock file (in case pyproject.toml changed)
       # ----------------------------------------------------------------
       - name: Update lock file
-        run: poetry lock --no-update
+        run: poetry lock
 
       # ----------------------------------------------------------------
       # 6. Install dependencies (skip when cache hit)
