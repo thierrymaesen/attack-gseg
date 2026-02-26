@@ -11,6 +11,7 @@ from typing import Any, Dict, List
 from unittest.mock import MagicMock, patch
 
 import pytest
+import requests
 
 from gseg.ingest_attack import (
     download_attack_stix,
@@ -140,7 +141,7 @@ class TestDownloadAttackStix:
     @patch("gseg.ingest_attack.requests.get")
     def test_failure_exits(self, mock_get: MagicMock, tmp_path: Path) -> None:
         """Download failure after all retries triggers SystemExit."""
-        mock_get.side_effect = ConnectionError("Network unreachable")
+        mock_get.side_effect = requests.ConnectionError("Network unreachable")
 
         output_path: Path = tmp_path / "enterprise-attack.json"
 
