@@ -13,6 +13,7 @@ Usage:
     poetry run python -m gseg.api
     poetry run uvicorn gseg.api:app --reload
 """
+
 from __future__ import annotations
 
 import logging
@@ -255,9 +256,7 @@ async def map_event(request: SearchRequest) -> SearchResponse:
         )
 
     elapsed_ms: float = round((time.monotonic() - t_start) * 1000.0, 1)
-    logger.info(
-        "POST /map_event -- %d results in %.1f ms", len(techniques), elapsed_ms
-    )
+    logger.info("POST /map_event -- %d results in %.1f ms", len(techniques), elapsed_ms)
 
     return SearchResponse(
         query=request.text,

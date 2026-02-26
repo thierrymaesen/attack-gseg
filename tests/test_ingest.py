@@ -39,8 +39,10 @@ def sample_stix_data() -> Dict[str, Any]:
                   "name": "Process Injection",
                   "description": "Inject code into processes.",
                   "kill_chain_phases": [
-                      {"kill_chain_name": "mitre-attack", "phase_name": "defense-evasion"},
-                      {"kill_chain_name": "mitre-attack", "phase_name": "privilege-escalation"},
+                      {"kill_chain_name": "mitre-attack",
+                          "phase_name": "defense-evasion"},
+                      {"kill_chain_name": "mitre-attack",
+                          "phase_name": "privilege-escalation"},
                   ],
                   "external_references": [
                       {

@@ -27,8 +27,7 @@ from tqdm import tqdm
 # ---------------------------------------------------------------------------
 
 ATTACK_STIX_URL: str = (
-    "https://raw.githubusercontent.com/mitre/cti/"
-    "master/enterprise-attack/enterprise-attack.json"
+    "https://raw.githubusercontent.com/mitre/cti/" "master/enterprise-attack/enterprise-attack.json"
 )
 DEFAULT_OUTPUT_DIR: Path = Path("data")
 REQUEST_TIMEOUT: int = 30
@@ -121,7 +120,7 @@ def download_attack_stix(output_path: Path, force: bool = False) -> Path:
                 exc,
             )
             if attempt < MAX_RETRIES:
-                wait_seconds: float = RETRY_BACKOFF ** attempt
+                wait_seconds: float = RETRY_BACKOFF**attempt
                 logger.info("Retrying in %.0f s\u2026", wait_seconds)
                 time.sleep(wait_seconds)
 
@@ -171,7 +170,8 @@ def parse_techniques(stix_data: dict[str, Any]) -> list[dict[str, Any]]:
     stix_objects: list[dict[str, Any]] = stix_data.get("objects", [])
 
     attack_patterns = [
-        obj for obj in stix_objects
+        obj
+        for obj in stix_objects
         if obj.get("type") == "attack-pattern"
         and not obj.get("revoked", False)
         and not obj.get("x_mitre_deprecated", False)
@@ -187,8 +187,7 @@ def parse_techniques(stix_data: dict[str, Any]) -> list[dict[str, Any]]:
             continue
 
         tactics: list[str] = [
-            phase.get("phase_name", "unknown")
-            for phase in obj.get("kill_chain_phases", [])
+            phase.get("phase_name", "unknown") for phase in obj.get("kill_chain_phases", [])
         ]
 
         technique: dict[str, Any] = {
@@ -218,7 +217,8 @@ def parse_mitigations(stix_data: dict[str, Any]) -> list[dict[str, Any]]:
     stix_objects: list[dict[str, Any]] = stix_data.get("objects", [])
 
     courses_of_action = [
-        obj for obj in stix_objects
+        obj
+        for obj in stix_objects
         if obj.get("type") == "course-of-action"
         and not obj.get("revoked", False)
         and not obj.get("x_mitre_deprecated", False)
@@ -275,7 +275,8 @@ def parse_relations(
                 stix_to_attack[obj["id"]] = attack_id
 
     mitigates_relationships = [
-        obj for obj in stix_objects
+        obj
+        for obj in stix_objects
         if obj.get("type") == "relationship"
         and obj.get("relationship_type") == "mitigates"
         and not obj.get("revoked", False)
@@ -287,9 +288,7 @@ def parse_relations(
 
     relations: list[dict[str, str]] = []
 
-    for obj in tqdm(
-        mitigates_relationships, desc="Parsing relations", unit="rel"
-    ):
+    for obj in tqdm(mitigates_relationships, desc="Parsing relations", unit="rel"):
         source_stix_id: str = obj.get("source_ref", "")
         target_stix_id: str = obj.get("target_ref", "")
 
@@ -309,8 +308,7 @@ def parse_relations(
             or resolved_mitigation not in known_mitigation_ids
         ):
             logger.warning(
-                "Relation references revoked/deprecated object: "
-                "%s -> %s \u2014 skipping",
+                "Relation references revoked/deprecated object: " "%s -> %s \u2014 skipping",
                 resolved_mitigation,
                 resolved_technique,
             )
@@ -413,9 +411,7 @@ def main() -> None:
         # 3. Parse entities
         techniques: list[dict[str, Any]] = parse_techniques(stix_data)
         mitigations: list[dict[str, Any]] = parse_mitigations(stix_data)
-        relations: list[dict[str, str]] = parse_relations(
-            stix_data, techniques, mitigations
-        )
+        relations: list[dict[str, str]] = parse_relations(stix_data, techniques, mitigations)
 
         # 4. Save structured JSON files
         save_json(techniques, output_dir / "techniques.json")

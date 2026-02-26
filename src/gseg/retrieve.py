@@ -9,6 +9,7 @@ Usage:
     poetry run python -m gseg.retrieve --query "process injection" --top-k 5
     poetry run python -m gseg.retrieve --query "lateral movement ssh" --top-k 3 --show-mitigations
 """
+
 from __future__ import annotations
 
 import argparse
@@ -37,9 +38,31 @@ TOKEN_PATTERN: str = r"[A-Za-z0-9_\-\.]+"
 
 STOPWORDS: frozenset[str] = frozenset(
     {
-        "the", "and", "of", "to", "a", "an", "in", "for", "on", "with",
-        "is", "it", "or", "by", "be", "as", "at", "from", "this", "that",
-        "are", "was", "can", "may", "not",
+        "the",
+        "and",
+        "of",
+        "to",
+        "a",
+        "an",
+        "in",
+        "for",
+        "on",
+        "with",
+        "is",
+        "it",
+        "or",
+        "by",
+        "be",
+        "as",
+        "at",
+        "from",
+        "this",
+        "that",
+        "are",
+        "was",
+        "can",
+        "may",
+        "not",
     }
 )
 
@@ -77,15 +100,11 @@ def load_text_index(path: Path) -> Dict[str, str]:
         data: Any = json.load(fh)
 
     if not isinstance(data, dict):
-        raise ValueError(
-            f"Expected a JSON object in {path}, got {type(data).__name__}"
-        )
+        raise ValueError(f"Expected a JSON object in {path}, got {type(data).__name__}")
 
     for key, value in data.items():
         if not isinstance(key, str) or not isinstance(value, str):
-            raise ValueError(
-                f"Text index must map str -> str; invalid entry for key {key!r}"
-            )
+            raise ValueError(f"Text index must map str -> str; invalid entry for key {key!r}")
 
     logger.info("Loaded text index with %d entries from %s", len(data), path)
     return data
@@ -158,8 +177,7 @@ class RetrieverBM25:
         logger.info("Indexed %d technique nodes for BM25", len(self.technique_ids))
 
         corpus_tokens: List[List[str]] = [
-            tokenize(self.text_index.get(tech_id, ""))
-            for tech_id in self.technique_ids
+            tokenize(self.text_index.get(tech_id, "")) for tech_id in self.technique_ids
         ]
         self._bm25: BM25Okapi = BM25Okapi(corpus_tokens)
 
@@ -261,20 +279,30 @@ def main() -> None:
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "--data-dir", type=Path, default=None,
+        "--data-dir",
+        type=Path,
+        default=None,
         help="Base data directory (overrides default graph and index paths)",
     )
     parser.add_argument(
-        "--graph-path", type=Path, default=None,
+        "--graph-path",
+        type=Path,
+        default=None,
         help="Explicit path to the graph gpickle file",
     )
     parser.add_argument(
-        "--text-index-path", type=Path, default=None,
+        "--text-index-path",
+        type=Path,
+        default=None,
         help="Explicit path to the text index JSON file",
     )
     parser.add_argument("--query", type=str, required=True, help="Search query string")
-    parser.add_argument("--top-k", type=int, default=DEFAULT_TOP_K, help="Number of results to return")
-    parser.add_argument("--show-mitigations", action="store_true", help="Display mitigations for each technique hit")
+    parser.add_argument(
+        "--top-k", type=int, default=DEFAULT_TOP_K, help="Number of results to return"
+    )
+    parser.add_argument(
+        "--show-mitigations", action="store_true", help="Display mitigations for each technique hit"
+    )
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable debug logging")
     args: argparse.Namespace = parser.parse_args()
     _configure_logging(args.verbose)
@@ -291,7 +319,8 @@ def main() -> None:
 
     try:
         retriever: RetrieverBM25 = RetrieverBM25(
-            graph_path=graph_path, text_index_path=text_index_path,
+            graph_path=graph_path,
+            text_index_path=text_index_path,
         )
 
         query_info: Dict[str, Any] = retriever.explain_query(args.query)

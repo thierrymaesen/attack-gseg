@@ -84,7 +84,10 @@ def sample_graph(
       sample_relations: List[Dict[str, str]],
 ) -> nx.DiGraph:
       """Build and return a graph from the sample data."""
-      return build_graph(sample_techniques, sample_mitigations, sample_relations)
+      return build_graph(
+    sample_techniques,
+    sample_mitigations,
+     sample_relations)
 
 
 # ---------------------------------------------------------------------------

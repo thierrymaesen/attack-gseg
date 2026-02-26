@@ -9,6 +9,7 @@ Usage:
     poetry run python -m gseg.build_graph
     poetry run python -m gseg.build_graph --data-dir data --verbose
 """
+
 from __future__ import annotations
 
 import argparse
@@ -105,7 +106,8 @@ def build_graph(
         if missing:
             logger.warning(
                 "Technique entry missing keys %s -- skipping: %s",
-                missing, tech.get("technique_id", "unknown"),
+                missing,
+                tech.get("technique_id", "unknown"),
             )
             continue
 
@@ -126,7 +128,8 @@ def build_graph(
         if missing:
             logger.warning(
                 "Mitigation entry missing keys %s -- skipping: %s",
-                missing, mit.get("mitigation_id", "unknown"),
+                missing,
+                mit.get("mitigation_id", "unknown"),
             )
             continue
 
@@ -159,7 +162,9 @@ def build_graph(
 
     logger.info(
         "Graph built -- %d technique nodes, %d mitigation nodes, %d edges",
-        technique_count, mitigation_count, edge_count,
+        technique_count,
+        mitigation_count,
+        edge_count,
     )
     return graph
 
@@ -187,15 +192,14 @@ def build_text_index(graph: nx.DiGraph) -> Dict[str, str]:
         node_type: str = attrs.get("type", "")
         if node_type == "technique":
             tactics_str: str = " ".join(attrs.get("tactics", []))
-            raw: str = (
-                f"{attrs.get('name', '')} {attrs.get('description', '')} {tactics_str}"
-            )
+            raw: str = f"{attrs.get('name', '')} {attrs.get('description', '')} {tactics_str}"
         elif node_type == "mitigation":
             raw = f"{attrs.get('name', '')} {attrs.get('description', '')}"
         else:
             logger.debug(
                 "Unknown node type '%s' for node %s -- skipping index",
-                node_type, node_id,
+                node_type,
+                node_id,
             )
             continue
         cleaned: str = re.sub(r"\s+", " ", raw.lower()).strip()
@@ -242,13 +246,12 @@ def compute_graph_stats(graph: nx.DiGraph) -> Dict[str, Any]:
         all_tactics.extend(graph.nodes[node_id].get("tactics", []))
     top_5_tactics: List[tuple[str, int]] = Counter(all_tactics).most_common(5)
 
-    techniques_without_mitigations: int = sum(
-        1 for t in technique_nodes if graph.in_degree(t) == 0
-    )
+    techniques_without_mitigations: int = sum(1 for t in technique_nodes if graph.in_degree(t) == 0)
     num_techniques: int = len(technique_nodes)
     mitigations_coverage: float = (
         ((num_techniques - techniques_without_mitigations) / num_techniques * 100.0)
-        if num_techniques else 0.0
+        if num_techniques
+        else 0.0
     )
 
     stats: Dict[str, Any] = {
@@ -302,7 +305,9 @@ def save_text_index(index: Dict[str, str], output_path: Path) -> None:
     size_kb: float = output_path.stat().st_size / 1024
     logger.info(
         "Text index saved -- %d entries to %s (%.1f KB)",
-        len(index), output_path, size_kb,
+        len(index),
+        output_path,
+        size_kb,
     )
 
 
@@ -365,15 +370,21 @@ def main() -> None:
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "--data-dir", type=Path, default=DEFAULT_DATA_DIR,
+        "--data-dir",
+        type=Path,
+        default=DEFAULT_DATA_DIR,
         help="Input directory containing techniques/mitigations/relations JSON files",
     )
     parser.add_argument(
-        "--output-dir", type=Path, default=DEFAULT_DATA_DIR,
+        "--output-dir",
+        type=Path,
+        default=DEFAULT_DATA_DIR,
         help="Output directory for graph and text index",
     )
     parser.add_argument(
-        "-v", "--verbose", action="store_true",
+        "-v",
+        "--verbose",
+        action="store_true",
         help="Enable debug logging",
     )
     args: argparse.Namespace = parser.parse_args()

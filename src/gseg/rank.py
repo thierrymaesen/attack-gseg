@@ -10,6 +10,7 @@ Usage:
     poetry run python -m gseg.rank --query "process injection"
     poetry run python -m gseg.rank --query "lateral movement" --use-retriever
 """
+
 from __future__ import annotations
 
 import argparse
@@ -76,13 +77,12 @@ class Reranker:
 
         logger.info(
             "Loading sentence-transformer model '%s' on device '%s' ...",
-            model_name, device,
+            model_name,
+            device,
         )
         t_start: float = time.monotonic()
         try:
-            self._model: SentenceTransformer = SentenceTransformer(
-                model_name, device=device
-            )
+            self._model: SentenceTransformer = SentenceTransformer(model_name, device=device)
         except Exception as exc:
             raise RuntimeError(
                 f"Failed to load sentence-transformer model '{model_name}': {exc}"
@@ -91,7 +91,8 @@ class Reranker:
         elapsed_ms: float = (time.monotonic() - t_start) * 1000.0
         logger.info(
             "Model loaded in %.0f ms -- embedding dim=%d",
-            elapsed_ms, self._model.get_sentence_embedding_dimension(),
+            elapsed_ms,
+            self._model.get_sentence_embedding_dimension(),
         )
 
     def rerank(
@@ -108,8 +109,7 @@ class Reranker:
             return candidates[:top_k]
 
         doc_texts: List[str] = [
-            f"{c.get('name', '')} {c.get('description', '')}".strip()
-            for c in candidates
+            f"{c.get('name', '')} {c.get('description', '')}".strip() for c in candidates
         ]
 
         t_start: float = time.monotonic()
@@ -124,8 +124,7 @@ class Reranker:
 
         similarities = util.cos_sim(query_embedding, doc_embeddings)[0]
         scores: np.ndarray = (
-            similarities.cpu().numpy() if hasattr(similarities, "cpu")
-            else np.array(similarities)
+            similarities.cpu().numpy() if hasattr(similarities, "cpu") else np.array(similarities)
         )
 
         ranked_indices: List[int] = sorted(
@@ -267,12 +266,32 @@ def main() -> None:
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--query", type=str, required=True, help="Search query string")
-    parser.add_argument("--model", type=str, default=DEFAULT_MODEL_NAME, help="Sentence-transformer model name")
-    parser.add_argument("--device", type=str, default=DEFAULT_DEVICE, help="Torch device (cpu or cuda)")
-    parser.add_argument("--top-k", type=int, default=DEFAULT_FINAL_K, help="Number of results after reranking")
-    parser.add_argument("--bm25-k", type=int, default=DEFAULT_BM25_K, help="Number of BM25 candidates (with --use-retriever)")
-    parser.add_argument("--data-dir", type=Path, default=None, help="Data directory for retriever (with --use-retriever)")
-    parser.add_argument("--use-retriever", action="store_true", help="Use the full BM25 + reranker pipeline with live data")
+    parser.add_argument(
+        "--model", type=str, default=DEFAULT_MODEL_NAME, help="Sentence-transformer model name"
+    )
+    parser.add_argument(
+        "--device", type=str, default=DEFAULT_DEVICE, help="Torch device (cpu or cuda)"
+    )
+    parser.add_argument(
+        "--top-k", type=int, default=DEFAULT_FINAL_K, help="Number of results after reranking"
+    )
+    parser.add_argument(
+        "--bm25-k",
+        type=int,
+        default=DEFAULT_BM25_K,
+        help="Number of BM25 candidates (with --use-retriever)",
+    )
+    parser.add_argument(
+        "--data-dir",
+        type=Path,
+        default=None,
+        help="Data directory for retriever (with --use-retriever)",
+    )
+    parser.add_argument(
+        "--use-retriever",
+        action="store_true",
+        help="Use the full BM25 + reranker pipeline with live data",
+    )
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable debug logging")
     args: argparse.Namespace = parser.parse_args()
     _configure_logging(args.verbose)
@@ -308,16 +327,14 @@ def main() -> None:
 
 def _run_demo_mode(args: argparse.Namespace, reranker: Reranker, sep: str) -> None:
     """Run reranking on hardcoded demo candidates."""
-    print(f"\n  Mode      : demo (hardcoded candidates)")
+    print("\n  Mode      : demo (hardcoded candidates)")
     print(f"  Candidates: {len(DEMO_CANDIDATES)}")
-    print(f"\n  --- Before reranking ---\n")
+    print("\n  --- Before reranking ---\n")
     for i, c in enumerate(DEMO_CANDIDATES, start=1):
         print(f"  {i}) {c['technique_id']} - {c['name']} | bm25={c['bm25_score']:.2f}")
 
     t_start: float = time.monotonic()
-    reranked: List[Dict[str, Any]] = reranker.rerank(
-        args.query, DEMO_CANDIDATES, top_k=args.top_k
-    )
+    reranked: List[Dict[str, Any]] = reranker.rerank(args.query, DEMO_CANDIDATES, top_k=args.top_k)
     elapsed_ms: float = (time.monotonic() - t_start) * 1000.0
 
     print(f"\n  --- After reranking ({elapsed_ms:.0f} ms) ---\n")
@@ -334,7 +351,7 @@ def _run_demo_mode(args: argparse.Namespace, reranker: Reranker, sep: str) -> No
 def _run_full_pipeline(args: argparse.Namespace, reranker: Reranker, sep: str) -> None:
     """Run the full BM25 + reranking pipeline with live data."""
     try:
-        from gseg.retrieve import RetrieverBM25, DEFAULT_DATA_DIR
+        from gseg.retrieve import DEFAULT_DATA_DIR, RetrieverBM25
     except ImportError:
         logger.error("Could not import gseg.retrieve. Ensure Sprint 3 module is available.")
         sys.exit(1)
@@ -344,15 +361,19 @@ def _run_full_pipeline(args: argparse.Namespace, reranker: Reranker, sep: str) -
     text_index_path: Path = data_dir / "text_index.json"
 
     retriever: RetrieverBM25 = RetrieverBM25(
-        graph_path=graph_path, text_index_path=text_index_path,
+        graph_path=graph_path,
+        text_index_path=text_index_path,
     )
 
     result: Dict[str, Any] = combine_retrieval_rerank(
-        retriever=retriever, reranker=reranker,
-        query=args.query, bm25_k=args.bm25_k, final_k=args.top_k,
+        retriever=retriever,
+        reranker=reranker,
+        query=args.query,
+        bm25_k=args.bm25_k,
+        final_k=args.top_k,
     )
 
-    print(f"\n  Mode      : full pipeline (BM25 + reranker)")
+    print("\n  Mode      : full pipeline (BM25 + reranker)")
     print(f"  BM25 cands: {result['bm25_candidates']}")
     print(f"  Latency   : {result['latency_ms']:.1f} ms")
     print(f"\n  Results ({len(result['results'])}):\n")
