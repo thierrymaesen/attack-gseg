@@ -30,16 +30,16 @@ jobs:
       - name: Install autopep8
         run: pip install autopep8
 
-      - name: Fix indentation with autopep8
+      - name: Fix indentation with autopep8 (aggressive)
         run: |
-          autopep8 --in-place --select=E1 --recursive tests/
-          autopep8 --in-place --select=E1 --recursive src/
+          autopep8 --in-place --aggressive --aggressive --recursive tests/
+          autopep8 --in-place --aggressive --aggressive --recursive src/
 
       - name: Fix lint issues with Ruff
         run: poetry run ruff check --fix src/ tests/ || true
 
-      - name: Format with Black
-        run: poetry run black src/ tests/
+      - name: Format with Black (allow partial failure)
+        run: poetry run black src/ tests/ || true
 
       - name: Commit changes
         run: |
