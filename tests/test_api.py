@@ -6,7 +6,7 @@ without loading heavy ML artefacts or graph files.
 from __future__ import annotations
 
 from typing import Any, Dict, List
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
