@@ -196,7 +196,7 @@ class TestBuildTextIndex:
         """All index text is lowercased."""
         index: Dict[str, str] = build_text_index(sample_graph)
         for text in index.values():
-                            assert text == text.lower()
+            assert text == text.lower()
 
 
 # ---------------------------------------------------------------------------
@@ -294,12 +294,12 @@ class TestLoadJson:
     def test_file_not_found(self, tmp_path: Path) -> None:
         """Missing file raises ``FileNotFoundError``."""
         with pytest.raises(FileNotFoundError):
-                            load_json(tmp_path / "nonexistent.json")
+            load_json(tmp_path / "nonexistent.json")
 
     def test_invalid_json(self, tmp_path: Path) -> None:
-                    """Malformed JSON raises ``json.JSONDecodeError``."""
-                    path: Path = tmp_path / "bad.json"
-                    path.write_text("{not valid json", encoding="utf-8")
+        """Malformed JSON raises ``json.JSONDecodeError``."""
+        path: Path = tmp_path / "bad.json"
+        path.write_text("{not valid json", encoding="utf-8")
 
         with pytest.raises(Exception):
             load_json(path)
